@@ -11,6 +11,7 @@
       "requireFullScreen": false
     },
     "android": {
+      "package": "com.alvaroac.labmetrologia",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
