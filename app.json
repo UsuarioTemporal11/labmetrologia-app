@@ -3,6 +3,7 @@
     "name": "Lab Metrología",
     "slug": "lab-metrologia",
     "version": "1.0.0",
+    "owner": "alvaroac26",
     "assetBundlePatterns": [
       "**/*"
     ],
