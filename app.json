@@ -24,14 +24,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      [
-        "expo-bluetooth",
-        {
-          "isBackgroundModeEnabled": false
-        }
-      ]
-    ]
+    }
   }
 }
