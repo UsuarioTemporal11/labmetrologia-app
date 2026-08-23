@@ -12,7 +12,7 @@ import {
   Modal,
   Picker,
 } from 'react-native';
-import { BluetoothSerial } from 'react-native-bluetooth-serial-next';
+import BluetoothSerial from 'react-native-bluetooth-serial-next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
