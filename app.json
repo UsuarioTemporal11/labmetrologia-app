@@ -1,31 +1,21 @@
 {
   "expo": {
     "name": "Lab Metrología",
-    "slug": "lab-metrologia",
+    "slug": "labmetrologia-app",
     "version": "1.0.0",
     "owner": "alvaroac26",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "ios": {
-      "supportsTabletMode": true,
+      "supportsTablet": true,
       "requireFullScreen": false
     },
     "android": {
       "package": "com.alvaroac.labmetrologia",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
       "permissions": [
         "android.permission.BLUETOOTH",
         "android.permission.BLUETOOTH_ADMIN",
         "android.permission.BLUETOOTH_CONNECT",
         "android.permission.BLUETOOTH_SCAN"
       ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
