@@ -12,7 +12,7 @@ import {
   Modal,
   Picker,
 } from 'react-native';
-import BluetoothSerial from 'react-native-bluetooth-serial-next';
+import RNBluetoothClassic from 'react-native-bluetooth-classic';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -24,6 +24,7 @@ const LabMetrologia = () => {
   const [pantalla, setPantalla] = useState('inicio'); // 'inicio', 'control', 'historial', 'reporte'
   const [bluetoothConnected, setBluetoothConnected] = useState(false);
   const [deviceAddress, setDeviceAddress] = useState(null);
+  const [dispositivoBT, setDispositivoBT] = useState(null);
   const [relojPatron, setRelojPatron] = useState('00:00:00.000');
   const [ensayoActivo, setEnsayoActivo] = useState(false);
   const [puntosDisparo, setPuntosDisparo] = useState([]);
@@ -63,7 +64,7 @@ const LabMetrologia = () => {
 
   const inicializarBluetooth = async () => {
     try {
-      const enabled = await BluetoothSerial.isEnabled();
+      const enabled = await RNBluetoothClassic.isBluetoothEnabled();
       if (!enabled) {
         Alert.alert('Activa Bluetooth', 'Por favor activa el Bluetooth del dispositivo');
         return;
@@ -74,64 +75,64 @@ const LabMetrologia = () => {
   };
 
   const conectarBluetooth = async () => {
-    try {
-      const devices = await BluetoothSerial.list();
-      if (devices.length === 0) {
-        Alert.alert('Sin dispositivos', 'No se encontraron dispositivos Bluetooth emparejados');
-        return;
-      }
-
-      // Busca HC-06
-      const hc06 = devices.find(d => d.name.includes('HC-06') || d.name.includes('hc-06'));
-      if (!hc06) {
-        Alert.alert('HC-06 no encontrado', 'Asegúrate de haber emparejado el HC-06');
-        return;
-      }
-
-      await BluetoothSerial.connect(hc06.id);
-      setDeviceAddress(hc06.id);
-      setBluetoothConnected(true);
-      escucharBluetooth();
-    } catch (err) {
-      Alert.alert('Error de conexión', err.message);
+  try {
+    const devices = await RNBluetoothClassic.getBondedDevices();
+    if (devices.length === 0) {
+      Alert.alert('Sin dispositivos', 'No se encontraron dispositivos Bluetooth emparejados');
+      return;
     }
-  };
 
-  const escucharBluetooth = async () => {
-    try {
-      BluetoothSerial.onDataReceived((data) => {
-        const texto = data.data.trim();
-        if (texto.match(/^\d{2}:\d{2}:\d{2}\.\d{3}$/)) {
-          setRelojPatron(texto);
-        }
-      });
-    } catch (err) {
-      console.log('Error escuchando: ', err);
+    const hc06 = devices.find(d => d.name.includes('HC-06') || d.name.includes('hc-06'));
+    if (!hc06) {
+      Alert.alert('HC-06 no encontrado', 'Asegúrate de haber emparejado el HC-06');
+      return;
     }
-  };
 
-  const desconectarBluetooth = async () => {
-    try {
-      if (bluetoothConnected) {
-        await BluetoothSerial.disconnect();
-        setBluetoothConnected(false);
+    const conectado = await hc06.connect();
+    setDispositivoBT(hc06);
+    setDeviceAddress(hc06.address);
+    setBluetoothConnected(true);
+    escucharBluetooth(hc06);
+  } catch (err) {
+    Alert.alert('Error de conexión', err.message);
+  }
+};
+
+const escucharBluetooth = (dispositivo) => {
+  try {
+    dispositivo.onDataReceived((data) => {
+      const texto = data.data.trim();
+      if (texto.match(/^\d{2}:\d{2}:\d{2}\.\d{3}$/)) {
+        setRelojPatron(texto);
       }
-    } catch (err) {
-      console.log('Error desconectando: ', err);
-    }
-  };
+    });
+  } catch (err) {
+    console.log('Error escuchando: ', err);
+  }
+};
 
-  const enviarComando = async (comando) => {
-    try {
-      if (!bluetoothConnected) {
-        Alert.alert('No conectado', 'Conecta primero el Bluetooth');
-        return;
-      }
-      await BluetoothSerial.write(comando + '\n');
-    } catch (err) {
-      Alert.alert('Error enviando comando', err.message);
+const desconectarBluetooth = async () => {
+  try {
+    if (bluetoothConnected && dispositivoBT) {
+      await dispositivoBT.disconnect();
+      setBluetoothConnected(false);
+      setDispositivoBT(null);
     }
-  };
+  } catch (err) {
+    console.log('Error desconectando: ', err);
+  }
+};
+const enviarComando = async (comando) => {
+  try {
+    if (!bluetoothConnected || !dispositivoBT) {
+      Alert.alert('No conectado', 'Conecta primero el Bluetooth');
+      return;
+    }
+    await dispositivoBT.write(comando + '\n');
+  } catch (err) {
+    Alert.alert('Error enviando comando', err.message);
+  }
+};
 
   // ============= CONTROL DE ENSAYO =============
   const iniciarEnsayo = async (tiempoSegundos) => {
