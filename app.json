@@ -17,6 +17,9 @@
         "android.permission.BLUETOOTH_SCAN"
       ]
     },
+    "splash": {
+      "backgroundColor": "#1a3a52"
+    },
     "extra": {
       "eas": {
         "projectId": "369e8bff-a0ff-45f1-a312-69ef17117549"
